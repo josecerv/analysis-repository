@@ -88,7 +88,7 @@ se_robust <- function(model)
 ### Visualization
 ### Tables
 
-```{r echo=TRUE}
+```{r echo=TRUE, results="markdown"}
 power_n <- function(exp) {
   function(x) {
     x ^ exp
