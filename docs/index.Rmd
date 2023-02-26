@@ -49,7 +49,7 @@ library(lmtest)
 ## Demographics
 ## Balance Checks
 ## Bar Plots/Histograms
-## Tables (NxN, NxM)
+## Tables
 ## Stargazer
 
 # Analysis
