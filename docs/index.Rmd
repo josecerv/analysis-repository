@@ -36,17 +36,6 @@ library(sandwich)
 library(lmtest)
 ```
 
-```{r include=FALSE}
-if ( (!is.null(knitr::current_input()))) {
-  if (("pdf_document" ==
-                rmarkdown::all_output_formats(knitr::current_input())[1])) {
-      stargazer_type <- "latex"
-  }
-} else {
-  stargazer_type <- "text"
-}
-```
-
 # Data cleaning
 
 ## Filtering
@@ -107,5 +96,4 @@ funs <- purrr::map(names, power_n)
 funs$root(64)
 funs$square(64)
 funs$cuberoot(64)
-
 ```
