@@ -1,4 +1,4 @@
-# analysis-repository
+# About
 
 Code repository for useful functions, tools, packages, and methods for data analysis, wrangling, visualization, and presentations.
 
