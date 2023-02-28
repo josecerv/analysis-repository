@@ -37,6 +37,7 @@ library(lmtest)
 ```
 
 # Data cleaning
+Hi, it's Sophia!!
 
 ## Filtering
 ## Merging, Joining
