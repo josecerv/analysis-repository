@@ -64,10 +64,10 @@ library(lmtest)
 
 ### Hierarchical Regression
 ```{r Hierarchical Regression}
-# Model1 <- lm(DV~Age + Experience, data = data)
-# Model2 <- lm(Performance~Age + Experience + Conscientiousness + Integrity, data = data)
-# Model3 <- lm(Performance~Age + Experience + Conscientiousness + Integrity + Intelligence + Aptitude, data = data)
-# Model4 <- lm(Performance~Age + Experience + Conscientiousness + Integrity + Intelligence + Aptitude + Income, data = data)
+# Model1 <- lm(DV~IV1 + IV2, data = data)
+# Model2 <- lm(DV~IV1 + IV2 + Control1 + Control2, data = data)
+# Model3 <- lm(DV~IV1 + IV2 + Control1 + Control2 + Control3 + Control4, data = data)
+# Model4 <- lm(DV~IV1 + IV2 + Control1 + Control2 + Control3 + Control4 + Control5, data = data)
 ```
 
 ```{r echo=TRUE}
