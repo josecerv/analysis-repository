@@ -37,6 +37,41 @@ library(lmtest)
 
 ```
 
+# Data Simulation
+
+```{r echo=TRUE, results="markdown"}
+library(simstudy)
+
+## define variables within the defData function
+### dist = distribution
+### formula = mean or probability
+### variance = variance
+### varname = variable name
+def <- defData(varname = "age", dist = "normal", formula = 10,
+    variance = 2)
+def <- defData(def, varname = "female", dist = "binary",
+    formula = "-2 + age * 0.1", link = "logit")
+def <- defData(def, varname = "visits", dist = "poisson",
+    formula = "1.5 - 0.2 * age + 0.5 * female", link = "log")
+def <- defData(def, varname = "shots", dist = "poisson",
+    formula = 3, variance = 1.5)
+set.seed(123)
+dd <- genData(1000, def)
+head(dd, 20)
+mean(dd$age) # should be near 10
+sd(dd$age)^2 # should be close to 2
+mean(dd$shots) # should be 3
+
+## assigning treatment/control
+
+## nTrt = number of treatments
+## ratio = probabilities
+
+study1 <- trtAssign(dd, nTrt = 2, balanced = TRUE, grpName = "TRT", ratio = c(0.5, 0.5))
+head(study1, 10)
+
+```
+
 # Data cleaning
 
 ## Filtering
