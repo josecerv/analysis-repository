@@ -440,9 +440,15 @@ Analysis</a></li>
 <h1>Analysis</h1>
 <div id="linear-models-ols-glm" class="section level2">
 <h2>Linear Models (OLS, GLM)</h2>
+<div id="multivariate-regression" class="section level3">
+<h3>Multivariate Regression</h3>
+</div>
+<div id="hierarchical-regression" class="section level3">
+<h3>Hierarchical Regression</h3>
 <pre class="r"><code># robust standard errors
 se_robust &lt;- function(model)
   coeftest(model, vcov = vcovHC(model, &quot;HC0&quot;)) </code></pre>
+</div>
 </div>
 <div id="mediation" class="section level2">
 <h2>Mediation</h2>

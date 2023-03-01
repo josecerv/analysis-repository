@@ -56,6 +56,19 @@ library(lmtest)
 # Analysis
 
 ## Linear Models (OLS, GLM)
+### Multivariate Regression
+```{r Multivariate Regression}
+#Mreg <-lm(cbind(DV, IV1, IV2)~ Control1 + Control2, data = data)
+#summary(Mreg)
+```
+
+### Hierarchical Regression
+```{r Hierarchical Regression}
+# Model1 <- lm(DV~Age + Experience, data = data)
+# Model2 <- lm(Performance~Age + Experience + Conscientiousness + Integrity, data = data)
+# Model3 <- lm(Performance~Age + Experience + Conscientiousness + Integrity + Intelligence + Aptitude, data = data)
+# Model4 <- lm(Performance~Age + Experience + Conscientiousness + Integrity + Intelligence + Aptitude + Income, data = data)
+```
 
 ```{r echo=TRUE}
 # robust standard errors
