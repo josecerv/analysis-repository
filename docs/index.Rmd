@@ -34,6 +34,7 @@ library(googlesheets4)
 library(stargazer)
 library(sandwich)
 library(lmtest)
+
 ```
 
 # Data cleaning
@@ -78,10 +79,6 @@ se_robust <- function(model)
 ### Tables
 
 ```{r echo=TRUE, results="markdown"}
-
-
- FUnctions
-
  power_n <- function(exp) {
    function(x) {
      x ^ exp
