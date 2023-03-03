@@ -349,7 +349,7 @@ display: none;
 
 
 <h1 class="title toc-ignore">Rmarkdown Repository</h1>
-<h4 class="date">Updated March 01, 2023</h4>
+<h4 class="date">Updated March 03, 2023</h4>
 
 </div>
 
@@ -520,6 +520,127 @@ se_robust &lt;- function(model)
 </div>
 <div id="power-analysis" class="section level2">
 <h2>Power Analysis</h2>
+<pre class="r"><code>## create power calculations for two-sample proportions
+## sample needed for various raw treatment effect
+## p1 = baseline treatment, p1+i = treatment increase
+p1 &lt;- c(0.01, 0.02, 0.024, 0.03, 0.04, 0.05)
+p1 &lt;- p1
+p2 &lt;- p1*1.02
+p3 &lt;- p1*1.05
+p4 &lt;- p1*1.10
+p5 &lt;- p1*1.15
+p6 &lt;- p1*1.20
+p7 &lt;- p1*1.25
+n1 &lt;- c()
+n2 &lt;- c()
+n3 &lt;- c()
+n4 &lt;- c()
+n5 &lt;- c()
+n6 &lt;- c()
+
+for(i in 1:length(p2)){
+  n1[i] &lt;- power.prop.test(p1=p1[i], p2=p2[i],power=0.9)$n
+  n2[i] &lt;- power.prop.test(p1=p1[i], p2=p3[i],power=0.9)$n
+  n3[i] &lt;- power.prop.test(p1=p1[i], p2=p4[i],power=0.9)$n
+  n4[i] &lt;- power.prop.test(p1=p1[i], p2=p5[i],power=0.9)$n
+  n5[i] &lt;- power.prop.test(p1=p1[i], p2=p6[i],power=0.9)$n
+  n6[i] &lt;- power.prop.test(p1=p1[i], p2=p7[i],power=0.9)$n
+}
+
+data.frame(Baseline = paste0(round(p1*100,2), &#39;%&#39;),
+           `1_Increase` = paste0(round(p2*100,2), &#39;%&#39;),
+           N1 = n1,
+           `2_Increase` = paste0(round(p3*100,2), &#39;%&#39;),
+           N2 = n2,
+           `3_Increase` = paste0(round(p4*100,2), &#39;%&#39;),
+           N3 = n3) %&gt;% 
+  rename(`2% Increase` = `X1_Increase`,
+         `5% Increase` = `X2_Increase`,
+         `N @ 2%` = N1,
+         `N @ 5%` = N2,
+         `10% Increase` = `X3_Increase`,
+         `N @ 10%` = N3) |&gt; 
+  pandoc.table(caption = &quot;Sample Size needed for alpha = 0.05 at power = 0.9 w/ 2%, 5%, and 10% increases&quot;)</code></pre>
+<table>
+<caption>Sample Size needed for alpha = 0.05 at power = 0.9 w/ 2%, 5%,
+and 10% increases</caption>
+<colgroup>
+<col width="13%" />
+<col width="16%" />
+<col width="12%" />
+<col width="16%" />
+<col width="10%" />
+<col width="18%" />
+<col width="12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Baseline</th>
+<th align="center">2% Increase</th>
+<th align="center">N @ 2%</th>
+<th align="center">5% Increase</th>
+<th align="center">N @ 5%</th>
+<th align="center">10% Increase</th>
+<th align="center">N @ 10%</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1%</td>
+<td align="center">1.02%</td>
+<td align="center">5252653</td>
+<td align="center">1.05%</td>
+<td align="center">852775</td>
+<td align="center">1.1%</td>
+<td align="center">218337</td>
+</tr>
+<tr class="even">
+<td align="center">2%</td>
+<td align="center">2.04%</td>
+<td align="center">2599529</td>
+<td align="center">2.1%</td>
+<td align="center">421971</td>
+<td align="center">2.2%</td>
+<td align="center">108009</td>
+</tr>
+<tr class="odd">
+<td align="center">2.4%</td>
+<td align="center">2.45%</td>
+<td align="center">2157342</td>
+<td align="center">2.52%</td>
+<td align="center">350170</td>
+<td align="center">2.64%</td>
+<td align="center">89621</td>
+</tr>
+<tr class="even">
+<td align="center">3%</td>
+<td align="center">3.06%</td>
+<td align="center">1715154</td>
+<td align="center">3.15%</td>
+<td align="center">278369</td>
+<td align="center">3.3%</td>
+<td align="center">71233</td>
+</tr>
+<tr class="odd">
+<td align="center">4%</td>
+<td align="center">4.08%</td>
+<td align="center">1272967</td>
+<td align="center">4.2%</td>
+<td align="center">206569</td>
+<td align="center">4.4%</td>
+<td align="center">52845</td>
+</tr>
+<tr class="even">
+<td align="center">5%</td>
+<td align="center">5.1%</td>
+<td align="center">1007655</td>
+<td align="center">5.25%</td>
+<td align="center">163488</td>
+<td align="center">5.5%</td>
+<td align="center">41812</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="bootstrapping-simulation" class="section level2">
 <h2>Bootstrapping, Simulation</h2>
