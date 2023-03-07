@@ -349,7 +349,7 @@ display: none;
 
 
 <h1 class="title toc-ignore">Rmarkdown Repository</h1>
-<h4 class="date">Updated March 03, 2023</h4>
+<h4 class="date">Updated March 07, 2023</h4>
 
 </div>
 
@@ -378,7 +378,15 @@ Plots/Histograms</a></li>
 </ul></li>
 <li><a href="#analysis" id="toc-analysis">Analysis</a>
 <ul>
-<li><a href="#linear-models-ols-glm" id="toc-linear-models-ols-glm">Linear Models (OLS, GLM)</a></li>
+<li><a href="#linear-models-ols-glm" id="toc-linear-models-ols-glm">Linear Models (OLS, GLM)</a>
+<ul>
+<li><a href="#robust-standard-errors-in-r" id="toc-robust-standard-errors-in-r">Robust Standard Errors in
+R</a></li>
+<li><a href="#modular-regression-formulas" id="toc-modular-regression-formulas">Modular Regression
+formulas</a></li>
+<li><a href="#multivariate-regression" id="toc-multivariate-regression">Multivariate Regression</a></li>
+<li><a href="#hierarchical-regression" id="toc-hierarchical-regression">Hierarchical Regression</a></li>
+</ul></li>
 <li><a href="#mediation" id="toc-mediation">Mediation</a></li>
 <li><a href="#power-analysis" id="toc-power-analysis">Power
 Analysis</a></li>
@@ -394,7 +402,12 @@ Unrelated Regressions (testing other models)</a></li>
 verbs</a></li>
 <li><a href="#function-factories" id="toc-function-factories">Function
 factories</a></li>
-<li><a href="#applications-for-analysis" id="toc-applications-for-analysis">Applications for Analysis</a></li>
+<li><a href="#applications-for-analysis" id="toc-applications-for-analysis">Applications for Analysis</a>
+<ul>
+<li><a href="#cleaning" id="toc-cleaning">Cleaning</a></li>
+<li><a href="#visualization" id="toc-visualization">Visualization</a></li>
+<li><a href="#tables-1" id="toc-tables-1">Tables</a></li>
+</ul></li>
 </ul></li>
 </ul>
 </div>
@@ -505,14 +518,38 @@ head(study1, 10)</code></pre>
 <h1>Analysis</h1>
 <div id="linear-models-ols-glm" class="section level2">
 <h2>Linear Models (OLS, GLM)</h2>
+<div id="robust-standard-errors-in-r" class="section level3">
+<h3>Robust Standard Errors in R</h3>
+<pre class="r"><code># robust standard errors
+se_robust &lt;- function(model)
+  coeftest(model, vcov = vcovHC(model, &quot;HC0&quot;)) </code></pre>
+</div>
+<div id="modular-regression-formulas" class="section level3">
+<h3>Modular Regression formulas</h3>
+<pre class="r"><code># initialize data
+y = rep(seq(0,1), 5)
+x1 = runif(10)
+x2 = runif(10)
+x3 = runif(10)
+## or you can create a bunch of variables at a time
+for(i in 1:25){
+  assign(paste0(&quot;x&quot;, i), runif(10))
+}
+
+# create a vector of your covariates, control, no controls, etc.
+covariates &lt;- paste(&quot;x&quot;, 1:25, sep=&quot;&quot;)
+
+# create a formula, or you can loop create various formulas as above
+formula &lt;- as.formula(paste(&quot;y ~ &quot;, paste(covariates, collapse= &quot;+&quot;)))
+
+# run regression
+lm(formula)</code></pre>
+</div>
 <div id="multivariate-regression" class="section level3">
 <h3>Multivariate Regression</h3>
 </div>
 <div id="hierarchical-regression" class="section level3">
 <h3>Hierarchical Regression</h3>
-<pre class="r"><code># robust standard errors
-se_robust &lt;- function(model)
-  coeftest(model, vcov = vcovHC(model, &quot;HC0&quot;)) </code></pre>
 </div>
 </div>
 <div id="mediation" class="section level2">
@@ -561,86 +598,6 @@ data.frame(Baseline = paste0(round(p1*100,2), &#39;%&#39;),
          `10% Increase` = `X3_Increase`,
          `N @ 10%` = N3) |&gt; 
   pandoc.table(caption = &quot;Sample Size needed for alpha = 0.05 at power = 0.9 w/ 2%, 5%, and 10% increases&quot;)</code></pre>
-<table>
-<caption>Sample Size needed for alpha = 0.05 at power = 0.9 w/ 2%, 5%,
-and 10% increases</caption>
-<colgroup>
-<col width="13%" />
-<col width="16%" />
-<col width="12%" />
-<col width="16%" />
-<col width="10%" />
-<col width="18%" />
-<col width="12%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="center">Baseline</th>
-<th align="center">2% Increase</th>
-<th align="center">N @ 2%</th>
-<th align="center">5% Increase</th>
-<th align="center">N @ 5%</th>
-<th align="center">10% Increase</th>
-<th align="center">N @ 10%</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="center">1%</td>
-<td align="center">1.02%</td>
-<td align="center">5252653</td>
-<td align="center">1.05%</td>
-<td align="center">852775</td>
-<td align="center">1.1%</td>
-<td align="center">218337</td>
-</tr>
-<tr class="even">
-<td align="center">2%</td>
-<td align="center">2.04%</td>
-<td align="center">2599529</td>
-<td align="center">2.1%</td>
-<td align="center">421971</td>
-<td align="center">2.2%</td>
-<td align="center">108009</td>
-</tr>
-<tr class="odd">
-<td align="center">2.4%</td>
-<td align="center">2.45%</td>
-<td align="center">2157342</td>
-<td align="center">2.52%</td>
-<td align="center">350170</td>
-<td align="center">2.64%</td>
-<td align="center">89621</td>
-</tr>
-<tr class="even">
-<td align="center">3%</td>
-<td align="center">3.06%</td>
-<td align="center">1715154</td>
-<td align="center">3.15%</td>
-<td align="center">278369</td>
-<td align="center">3.3%</td>
-<td align="center">71233</td>
-</tr>
-<tr class="odd">
-<td align="center">4%</td>
-<td align="center">4.08%</td>
-<td align="center">1272967</td>
-<td align="center">4.2%</td>
-<td align="center">206569</td>
-<td align="center">4.4%</td>
-<td align="center">52845</td>
-</tr>
-<tr class="even">
-<td align="center">5%</td>
-<td align="center">5.1%</td>
-<td align="center">1007655</td>
-<td align="center">5.25%</td>
-<td align="center">163488</td>
-<td align="center">5.5%</td>
-<td align="center">41812</td>
-</tr>
-</tbody>
-</table>
 </div>
 <div id="bootstrapping-simulation" class="section level2">
 <h2>Bootstrapping, Simulation</h2>

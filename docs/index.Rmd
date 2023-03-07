@@ -4,7 +4,7 @@ date: 'Updated `r format(Sys.Date(), "%B %d, %Y")`'
 output:
   html_document:
     toc: yes
-    toc_depth: 2
+    toc_depth: 3
     fig_caption: true
 header-includes:
   \renewcommand{\contentsname}{Items}
@@ -91,6 +91,38 @@ head(study1, 10)
 # Analysis
 
 ## Linear Models (OLS, GLM)
+
+### Robust Standard Errors in R
+
+```{r echo=TRUE}
+# robust standard errors
+se_robust <- function(model)
+  coeftest(model, vcov = vcovHC(model, "HC0")) 
+```
+
+### Modular Regression formulas
+
+```{r echo=TRUE}
+# initialize data
+y = rep(seq(0,1), 5)
+x1 = runif(10)
+x2 = runif(10)
+x3 = runif(10)
+## or you can create a bunch of variables at a time
+for(i in 1:25){
+  assign(paste0("x", i), runif(10))
+}
+
+# create a vector of your covariates, control, no controls, etc.
+covariates <- paste("x", 1:25, sep="")
+
+# create a formula, or you can loop create various formulas as above
+formula <- as.formula(paste("y ~ ", paste(covariates, collapse= "+")))
+
+# run regression
+lm(formula)
+
+```
 ### Multivariate Regression
 ```{r Multivariate Regression}
 #Mreg <-lm(cbind(DV, IV1, IV2)~ Control1 + Control2, data = data)
@@ -105,16 +137,10 @@ head(study1, 10)
 # Model4 <- lm(DV~IV1 + IV2 + Control1 + Control2 + Control3 + Control4 + Control5, data = data)
 ```
 
-```{r echo=TRUE}
-# robust standard errors
-se_robust <- function(model)
-  coeftest(model, vcov = vcovHC(model, "HC0")) 
-```
-
 ## Mediation
 ## Power Analysis
 
-```{r echo=TRUE, results="asis"}
+```{r echo=TRUE}
 
 ## create power calculations for two-sample proportions
 ## sample needed for various raw treatment effect
