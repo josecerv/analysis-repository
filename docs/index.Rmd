@@ -70,6 +70,7 @@ mean(dd$shots) # should be 3
 study1 <- trtAssign(dd, nTrt = 2, balanced = TRUE, grpName = "TRT", ratio = c(0.5, 0.5))
 head(study1, 10)
 
+>>>>>>> de36bc9667ce0a0e5d3eb383985d1ba8d5856a36
 ```
 
 # Data cleaning
