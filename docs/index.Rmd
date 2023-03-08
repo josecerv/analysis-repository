@@ -35,8 +35,6 @@ library(stargazer)
 library(sandwich)
 library(lmtest)
 
-<<<<<<< HEAD
-=======
 ```
 
 # Data Simulation
