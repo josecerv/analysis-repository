@@ -4,7 +4,7 @@ date: 'Updated `r format(Sys.Date(), "%B %d, %Y")`'
 output:
   html_document:
     toc: yes
-    toc_depth: 2
+    toc_depth: 3
     fig_caption: true
 header-includes:
   \renewcommand{\contentsname}{Items}
@@ -35,6 +35,44 @@ library(stargazer)
 library(sandwich)
 library(lmtest)
 
+<<<<<<< HEAD
+=======
+```
+
+# Data Simulation
+
+```{r echo=TRUE, results="markdown"}
+library(simstudy)
+
+## define variables within the defData function
+### dist = distribution
+### formula = mean or probability
+### variance = variance
+### varname = variable name
+def <- defData(varname = "age", dist = "normal", formula = 10,
+    variance = 2)
+def <- defData(def, varname = "female", dist = "binary",
+    formula = "-2 + age * 0.1", link = "logit")
+def <- defData(def, varname = "visits", dist = "poisson",
+    formula = "1.5 - 0.2 * age + 0.5 * female", link = "log")
+def <- defData(def, varname = "shots", dist = "poisson",
+    formula = 3, variance = 1.5)
+set.seed(123)
+dd <- genData(1000, def)
+head(dd, 20)
+mean(dd$age) # should be near 10
+sd(dd$age)^2 # should be close to 2
+mean(dd$shots) # should be 3
+
+## assigning treatment/control
+
+## nTrt = number of treatments
+## ratio = probabilities
+
+study1 <- trtAssign(dd, nTrt = 2, balanced = TRUE, grpName = "TRT", ratio = c(0.5, 0.5))
+head(study1, 10)
+
+>>>>>>> de36bc9667ce0a0e5d3eb383985d1ba8d5856a36
 ```
 
 # Data cleaning
@@ -57,14 +95,100 @@ library(lmtest)
 
 ## Linear Models (OLS, GLM)
 
+### Robust Standard Errors in R
+
 ```{r echo=TRUE}
 # robust standard errors
 se_robust <- function(model)
   coeftest(model, vcov = vcovHC(model, "HC0")) 
 ```
 
+### Modular Regression formulas
+
+```{r echo=TRUE}
+# initialize data
+y = rep(seq(0,1), 5)
+x1 = runif(10)
+x2 = runif(10)
+x3 = runif(10)
+## or you can create a bunch of variables at a time
+for(i in 1:25){
+  assign(paste0("x", i), runif(10))
+}
+
+# create a vector of your covariates, control, no controls, etc.
+covariates <- paste("x", 1:25, sep="")
+
+# create a formula, or you can loop create various formulas as above
+formula <- as.formula(paste("y ~ ", paste(covariates, collapse= "+")))
+
+# run regression
+lm(formula)
+
+```
+### Multivariate Regression
+```{r Multivariate Regression}
+#Mreg <-lm(cbind(DV, IV1, IV2)~ Control1 + Control2, data = data)
+#summary(Mreg)
+```
+
+### Hierarchical Regression
+```{r Hierarchical Regression}
+# Model1 <- lm(DV~IV1 + IV2, data = data)
+# Model2 <- lm(DV~IV1 + IV2 + Control1 + Control2, data = data)
+# Model3 <- lm(DV~IV1 + IV2 + Control1 + Control2 + Control3 + Control4, data = data)
+# Model4 <- lm(DV~IV1 + IV2 + Control1 + Control2 + Control3 + Control4 + Control5, data = data)
+```
+
 ## Mediation
 ## Power Analysis
+
+```{r echo=TRUE}
+
+## create power calculations for two-sample proportions
+## sample needed for various raw treatment effect
+## p1 = baseline treatment, p1+i = treatment increase
+p1 <- c(0.01, 0.02, 0.024, 0.03, 0.04, 0.05)
+p1 <- p1
+p2 <- p1*1.02
+p3 <- p1*1.05
+p4 <- p1*1.10
+p5 <- p1*1.15
+p6 <- p1*1.20
+p7 <- p1*1.25
+n1 <- c()
+n2 <- c()
+n3 <- c()
+n4 <- c()
+n5 <- c()
+n6 <- c()
+
+for(i in 1:length(p2)){
+  n1[i] <- power.prop.test(p1=p1[i], p2=p2[i],power=0.9)$n
+  n2[i] <- power.prop.test(p1=p1[i], p2=p3[i],power=0.9)$n
+  n3[i] <- power.prop.test(p1=p1[i], p2=p4[i],power=0.9)$n
+  n4[i] <- power.prop.test(p1=p1[i], p2=p5[i],power=0.9)$n
+  n5[i] <- power.prop.test(p1=p1[i], p2=p6[i],power=0.9)$n
+  n6[i] <- power.prop.test(p1=p1[i], p2=p7[i],power=0.9)$n
+}
+
+data.frame(Baseline = paste0(round(p1*100,2), '%'),
+           `1_Increase` = paste0(round(p2*100,2), '%'),
+           N1 = n1,
+           `2_Increase` = paste0(round(p3*100,2), '%'),
+           N2 = n2,
+           `3_Increase` = paste0(round(p4*100,2), '%'),
+           N3 = n3) %>% 
+  rename(`2% Increase` = `X1_Increase`,
+         `5% Increase` = `X2_Increase`,
+         `N @ 2%` = N1,
+         `N @ 5%` = N2,
+         `10% Increase` = `X3_Increase`,
+         `N @ 10%` = N3) |> 
+  pandoc.table(caption = "Sample Size needed for alpha = 0.05 at power = 0.9 w/ 2%, 5%, and 10% increases")
+
+```
+
 ## Bootstrapping, Simulation
 ## Model Estimations (coefficient testing)
 ## Seemingly Unrelated Regressions (testing other models)
@@ -79,10 +203,6 @@ se_robust <- function(model)
 ### Tables
 
 ```{r echo=TRUE, results="markdown"}
-
-
- FUnctions
-
  power_n <- function(exp) {
    function(x) {
      x ^ exp

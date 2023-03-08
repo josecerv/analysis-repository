@@ -349,12 +349,14 @@ display: none;
 
 
 <h1 class="title toc-ignore">Rmarkdown Repository</h1>
-<h4 class="date">Updated March 01, 2023</h4>
+<h4 class="date">Updated March 07, 2023</h4>
 
 </div>
 
 <div id="TOC">
 <ul>
+<li><a href="#data-simulation" id="toc-data-simulation">Data
+Simulation</a></li>
 <li><a href="#data-cleaning" id="toc-data-cleaning">Data cleaning</a>
 <ul>
 <li><a href="#filtering" id="toc-filtering">Filtering</a></li>
@@ -376,7 +378,15 @@ Plots/Histograms</a></li>
 </ul></li>
 <li><a href="#analysis" id="toc-analysis">Analysis</a>
 <ul>
-<li><a href="#linear-models-ols-glm" id="toc-linear-models-ols-glm">Linear Models (OLS, GLM)</a></li>
+<li><a href="#linear-models-ols-glm" id="toc-linear-models-ols-glm">Linear Models (OLS, GLM)</a>
+<ul>
+<li><a href="#robust-standard-errors-in-r" id="toc-robust-standard-errors-in-r">Robust Standard Errors in
+R</a></li>
+<li><a href="#modular-regression-formulas" id="toc-modular-regression-formulas">Modular Regression
+formulas</a></li>
+<li><a href="#multivariate-regression" id="toc-multivariate-regression">Multivariate Regression</a></li>
+<li><a href="#hierarchical-regression" id="toc-hierarchical-regression">Hierarchical Regression</a></li>
+</ul></li>
 <li><a href="#mediation" id="toc-mediation">Mediation</a></li>
 <li><a href="#power-analysis" id="toc-power-analysis">Power
 Analysis</a></li>
@@ -392,11 +402,82 @@ Unrelated Regressions (testing other models)</a></li>
 verbs</a></li>
 <li><a href="#function-factories" id="toc-function-factories">Function
 factories</a></li>
-<li><a href="#applications-for-analysis" id="toc-applications-for-analysis">Applications for Analysis</a></li>
+<li><a href="#applications-for-analysis" id="toc-applications-for-analysis">Applications for Analysis</a>
+<ul>
+<li><a href="#cleaning" id="toc-cleaning">Cleaning</a></li>
+<li><a href="#visualization" id="toc-visualization">Visualization</a></li>
+<li><a href="#tables-1" id="toc-tables-1">Tables</a></li>
+</ul></li>
 </ul></li>
 </ul>
 </div>
 
+<div id="data-simulation" class="section level1">
+<h1>Data Simulation</h1>
+<pre class="r"><code>library(simstudy)
+
+## define variables within the defData function
+### dist = distribution
+### formula = mean or probability
+### variance = variance
+### varname = variable name
+def &lt;- defData(varname = &quot;age&quot;, dist = &quot;normal&quot;, formula = 10,
+    variance = 2)
+def &lt;- defData(def, varname = &quot;female&quot;, dist = &quot;binary&quot;,
+    formula = &quot;-2 + age * 0.1&quot;, link = &quot;logit&quot;)
+def &lt;- defData(def, varname = &quot;visits&quot;, dist = &quot;poisson&quot;,
+    formula = &quot;1.5 - 0.2 * age + 0.5 * female&quot;, link = &quot;log&quot;)
+def &lt;- defData(def, varname = &quot;shots&quot;, dist = &quot;poisson&quot;,
+    formula = 3, variance = 1.5)
+set.seed(123)
+dd &lt;- genData(1000, def)
+head(dd, 20)</code></pre>
+<pre><code>##     id       age female visits shots
+##  1:  1  9.207368      0      0     2
+##  2:  2  9.674480      0      2     5
+##  3:  3 12.204346      0      0     3
+##  4:  4 10.099714      0      1     4
+##  5:  5 10.182840      0      0     2
+##  6:  6 12.425468      0      0     1
+##  7:  7 10.651834      0      1     5
+##  8:  8  8.210933      0      1     0
+##  9:  9  9.028643      0      2     3
+## 10: 10  9.369739      0      1     7
+## 11: 11 11.731113      1      3     2
+## 12: 12 10.508854      0      1     7
+## 13: 13 10.566776      0      1     0
+## 14: 14 10.156529      0      0     2
+## 15: 15  9.213922      1      0     2
+## 16: 16 12.527077      0      0     6
+## 17: 17 10.704067      1      2     7
+## 18: 18  7.218783      0      1     4
+## 19: 19 10.991867      0      1     2
+## 20: 20  9.331372      0      0     2</code></pre>
+<pre class="r"><code>mean(dd$age) # should be near 10</code></pre>
+<pre><code>## [1] 10.02281</code></pre>
+<pre class="r"><code>sd(dd$age)^2 # should be close to 2</code></pre>
+<pre><code>## [1] 1.966918</code></pre>
+<pre class="r"><code>mean(dd$shots) # should be 3</code></pre>
+<pre><code>## [1] 2.907</code></pre>
+<pre class="r"><code>## assigning treatment/control
+
+## nTrt = number of treatments
+## ratio = probabilities
+
+study1 &lt;- trtAssign(dd, nTrt = 2, balanced = TRUE, grpName = &quot;TRT&quot;, ratio = c(0.5, 0.5))
+head(study1, 10)</code></pre>
+<pre><code>##     id       age female visits shots TRT
+##  1:  1  9.207368      0      0     2   1
+##  2:  2  9.674480      0      2     5   0
+##  3:  3 12.204346      0      0     3   1
+##  4:  4 10.099714      0      1     4   1
+##  5:  5 10.182840      0      0     2   0
+##  6:  6 12.425468      0      0     1   1
+##  7:  7 10.651834      0      1     5   1
+##  8:  8  8.210933      0      1     0   1
+##  9:  9  9.028643      0      2     3   0
+## 10: 10  9.369739      0      1     7   0</code></pre>
+</div>
 <div id="data-cleaning" class="section level1">
 <h1>Data cleaning</h1>
 <div id="filtering" class="section level2">
@@ -437,15 +518,86 @@ factories</a></li>
 <h1>Analysis</h1>
 <div id="linear-models-ols-glm" class="section level2">
 <h2>Linear Models (OLS, GLM)</h2>
+<div id="robust-standard-errors-in-r" class="section level3">
+<h3>Robust Standard Errors in R</h3>
 <pre class="r"><code># robust standard errors
 se_robust &lt;- function(model)
   coeftest(model, vcov = vcovHC(model, &quot;HC0&quot;)) </code></pre>
+</div>
+<div id="modular-regression-formulas" class="section level3">
+<h3>Modular Regression formulas</h3>
+<pre class="r"><code># initialize data
+y = rep(seq(0,1), 5)
+x1 = runif(10)
+x2 = runif(10)
+x3 = runif(10)
+## or you can create a bunch of variables at a time
+for(i in 1:25){
+  assign(paste0(&quot;x&quot;, i), runif(10))
+}
+
+# create a vector of your covariates, control, no controls, etc.
+covariates &lt;- paste(&quot;x&quot;, 1:25, sep=&quot;&quot;)
+
+# create a formula, or you can loop create various formulas as above
+formula &lt;- as.formula(paste(&quot;y ~ &quot;, paste(covariates, collapse= &quot;+&quot;)))
+
+# run regression
+lm(formula)</code></pre>
+</div>
+<div id="multivariate-regression" class="section level3">
+<h3>Multivariate Regression</h3>
+</div>
+<div id="hierarchical-regression" class="section level3">
+<h3>Hierarchical Regression</h3>
+</div>
 </div>
 <div id="mediation" class="section level2">
 <h2>Mediation</h2>
 </div>
 <div id="power-analysis" class="section level2">
 <h2>Power Analysis</h2>
+<pre class="r"><code>## create power calculations for two-sample proportions
+## sample needed for various raw treatment effect
+## p1 = baseline treatment, p1+i = treatment increase
+p1 &lt;- c(0.01, 0.02, 0.024, 0.03, 0.04, 0.05)
+p1 &lt;- p1
+p2 &lt;- p1*1.02
+p3 &lt;- p1*1.05
+p4 &lt;- p1*1.10
+p5 &lt;- p1*1.15
+p6 &lt;- p1*1.20
+p7 &lt;- p1*1.25
+n1 &lt;- c()
+n2 &lt;- c()
+n3 &lt;- c()
+n4 &lt;- c()
+n5 &lt;- c()
+n6 &lt;- c()
+
+for(i in 1:length(p2)){
+  n1[i] &lt;- power.prop.test(p1=p1[i], p2=p2[i],power=0.9)$n
+  n2[i] &lt;- power.prop.test(p1=p1[i], p2=p3[i],power=0.9)$n
+  n3[i] &lt;- power.prop.test(p1=p1[i], p2=p4[i],power=0.9)$n
+  n4[i] &lt;- power.prop.test(p1=p1[i], p2=p5[i],power=0.9)$n
+  n5[i] &lt;- power.prop.test(p1=p1[i], p2=p6[i],power=0.9)$n
+  n6[i] &lt;- power.prop.test(p1=p1[i], p2=p7[i],power=0.9)$n
+}
+
+data.frame(Baseline = paste0(round(p1*100,2), &#39;%&#39;),
+           `1_Increase` = paste0(round(p2*100,2), &#39;%&#39;),
+           N1 = n1,
+           `2_Increase` = paste0(round(p3*100,2), &#39;%&#39;),
+           N2 = n2,
+           `3_Increase` = paste0(round(p4*100,2), &#39;%&#39;),
+           N3 = n3) %&gt;% 
+  rename(`2% Increase` = `X1_Increase`,
+         `5% Increase` = `X2_Increase`,
+         `N @ 2%` = N1,
+         `N @ 5%` = N2,
+         `10% Increase` = `X3_Increase`,
+         `N @ 10%` = N3) |&gt; 
+  pandoc.table(caption = &quot;Sample Size needed for alpha = 0.05 at power = 0.9 w/ 2%, 5%, and 10% increases&quot;)</code></pre>
 </div>
 <div id="bootstrapping-simulation" class="section level2">
 <h2>Bootstrapping, Simulation</h2>
