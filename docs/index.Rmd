@@ -112,15 +112,18 @@ x3 = runif(10)
 for(i in 1:25){
   assign(paste0("x", i), runif(10))
 }
-
 # create a vector of your covariates, control, no controls, etc.
-covariates <- paste("x", 1:25, sep="")
+covariates <- paste0("x", 1:3)
+
 
 # create a formula, or you can loop create various formulas as above
-formula <- as.formula(paste("y ~ ", paste(covariates, collapse= "+")))
+formula1 <- as.formula(paste("y ~ ", paste(covariates, collapse= "+")))
 
+# condensed formula
+formula2 <- as.formula(paste("y ~ ", paste(covariates[1:2], collapse= "+")))
 # run regression
-lm(formula)
+lm(formula1)
+lm(formula2)
 
 ```
 ### Multivariate Regression
