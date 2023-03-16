@@ -1,1 +1,54 @@
+---
+title: "Budgeting Categories Pilot #4"
+author: "Robert Kuan"
+date: "2023-03-03"
+output:
+#  pdf_document: 
+ html_document:
+   df_print: paged
+ toc: yes
+---
 
+```{r load_libraries, include=FALSE}
+library("tidyverse") # manipulating data
+library("knitr") 
+library(data.table)
+
+rm(list = ls())
+```
+
+```{r ingest_data, include=FALSE}
+
+# Read raw data file
+df <- read_csv("budget.csv")
+
+# Create dataframe for predictor variables
+df_x <- select(df, condition, gender, income, budget_past, education)
+df_y <- select(df, condition, wta, download, enjoyable, helpful_index)
+
+df_y |>
+  group_by(condition) |>
+  mutate(enjoyable_mean = mean(enjoyable)) |>
+  ungroup() |>
+  ggplot() +
+  geom_dotplot(aes(x = condition, fill = condition, color = condition, y = enjoyable), binaxis = 'y', dotsize = 0.2) +
+  scale_fill_manual(values = c("red", "blue", "green"))
+
+df_y |>
+  ggplot() +
+  geom_histogram(aes(x = enjoyable), bins = 7) +
+  facet_wrap(vars(condition))
+
+df_y |>
+  ggplot() +
+  geom_bar(aes(x = enjoyable, fill = condition), alpha = 0.5, position = "dodge") +
+  scale_fill_manual(values = c("red", "blue", "green"))
+  
+df_y |>
+  ggplot() +
+  geom_freqpoly(aes(x = enjoyable, color = condition), position = "identity", bins = 7) +
+  scale_fill_manual(values = c("red", "blue", "green"))
+
+
+
+```
