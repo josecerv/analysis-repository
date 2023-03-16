@@ -34,7 +34,8 @@ library(googlesheets4)
 library(stargazer)
 library(sandwich)
 library(lmtest)
-
+library(ggcorrplot)
+library(ggpubr)
 ```
 
 # Data Simulation
@@ -70,8 +71,10 @@ mean(dd$shots) # should be 3
 study1 <- trtAssign(dd, nTrt = 2, balanced = TRUE, grpName = "TRT", ratio = c(0.5, 0.5))
 head(study1, 10)
 
->>>>>>> de36bc9667ce0a0e5d3eb383985d1ba8d5856a36
+
 ```
+
+
 
 # Data cleaning
 
@@ -86,6 +89,95 @@ head(study1, 10)
 ## Demographics
 ## Balance Checks
 ## Bar Plots/Histograms
+## Correlation Matrices
+
+```{r echo=TRUE, results="markdown"}
+## create likert scale (7 Qs, 1-7 scale)
+def <- defRepeat(nVars = 7, prefix = "IVL", formula = "1/7;1/3;1/3;1/7;1/1;1/1; 1/1", dist = "categorical")
+def <- defRepeat(def, nVars = 3, prefix = "IVN", formula = 50, variance = 10, dist = "normal")
+df1 <- genData(100, def)
+df1 <- trtAssign(df1, nTrt = 4, balanced = TRUE, grpName = "TRT", ratio = c(0.25, 0.25, 0.25, 0.25))
+df1 <- df1 |> 
+  mutate(TRT = as.factor(TRT))
+head(df1)
+
+createCorMatrix <- function(data, sides = 1){
+
+    
+  
+  ## subset Likert items
+  likert_df <- df1 |> 
+  select(contains("IVL"))
+corr_likert <- round(cor(likert_df), 1)
+
+  ## subset continuous items
+  continuous_df <- df1 |> 
+  select(contains("IVN"))
+corr_cont <- round(cor(continuous_df), 1)
+
+  ## store all IVs
+  iv_df <- df1 |> 
+  select(contains("IV"))
+corr_iv <- round(cor(iv_df), 1)
+
+  ## make correlations plots of each type
+  ## only Likert IVs, only Continuous IVs, all IVs
+likert_plot <- ggcorrplot(corr_likert, hc.order = F, type = "lower",
+   outline.col = "black",
+   ggtheme = ggplot2::theme_gray,
+   colors = c("#6D9EC1", "white", "#E46726"))+
+  ggtitle("Correlation of Likert Items")
+
+cont_plot <- ggcorrplot(corr_cont, hc.order = F, type = "lower",
+   outline.col = "black",
+   ggtheme = ggplot2::theme_gray,
+   colors = c("#6D9EC1", "white", "#E46726"))+
+  ggtitle("Correlation of Continuous Items")
+
+iv_plot <- ggcorrplot(corr_iv, hc.order = F, type = "lower",
+   outline.col = "black",
+   ggtheme = ggplot2::theme_gray,
+   colors = c("#6D9EC1", "white", "#E46726"))+
+  ggtitle("Correlation of All Items")
+
+  if(sides > 1){
+    return(list(likert_plot, cont_plot, iv_plot))
+    
+  }
+  else{
+    print(likert_plot)
+    print(cont_plot) 
+    print(iv_plot)
+
+  }
+
+  
+}
+createCorMatrixCond <- function(data, conditions = 2){
+  
+  plot_list = list()
+  
+  for(i in seq_len(conditions)){
+  cond <- levels(data$TRT)[i]
+  
+  assign(paste0(cond, "_df"),
+         data |> 
+           filter(TRT == cond))
+  matrices <- get(paste0(cond, "_df"))
+  plots <- createCorMatrix(matrices,2)
+  group_plot <- ggarrange(plotlist = plots, legend = "right", ncol = 3)+
+    annotate(geom = "text", label = paste0("Condition ",cond, " Plot"), y = 0.85, x = 0.5, size = 10)
+  ggsave(paste0("Condition ",cond, " Plot.pdf"), group_plot, width = 17, height = 12)
+  print(group_plot)
+  }
+}
+
+createCorMatrix(df1)
+createCorMatrixCond(df1, conditions = length(levels(df1$TRT)))
+
+
+```
+
 ## Tables
 ## Stargazer
 
