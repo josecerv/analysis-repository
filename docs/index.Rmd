@@ -101,6 +101,14 @@ df1 <- df1 |>
   mutate(TRT = as.factor(TRT))
 head(df1)
 
+df1 <- read.csv('stock-analysis/budget.csv', header = T) |> 
+  rename(TRT = condition,
+         wta_IVN = wta,
+         download_IVL = download,
+         enjoyable_IVL = enjoyable,
+         helpful_index_IVN = helpful_index) |> 
+  mutate(TRT = as.factor(TRT))
+
 createCorMatrix <- function(data, sides = 1){
 
     
@@ -172,7 +180,7 @@ createCorMatrixCond <- function(data, conditions = 2){
   }
 }
 
-createCorMatrix(df1)
+createCorMatrix(df1) # add numbers, highlight correlation significant
 createCorMatrixCond(df1, conditions = length(levels(df1$TRT)))
 
 
