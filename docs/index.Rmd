@@ -107,7 +107,13 @@ df1 <- read.csv('stock-analysis/budget.csv', header = T) |>
          download_IVL = download,
          enjoyable_IVL = enjoyable,
          helpful_index_IVN = helpful_index) |> 
-  mutate(TRT = as.factor(TRT))
+  mutate(TRT = as.factor(TRT)) |> 
+  group_by(TRT) |> 
+  summarise_all(mean)
+
+typeof(df1$download)
+typeof(df1$helpful_index)
+
 
 createCorMatrix <- function(data, sides = 1){
 
