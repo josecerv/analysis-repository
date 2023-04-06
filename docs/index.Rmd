@@ -188,6 +188,44 @@ createCorMatrixCond <- function(data, conditions = 2){
 
 createCorMatrix(df1) # add numbers, highlight correlation significant
 createCorMatrixCond(df1, conditions = length(levels(df1$TRT)))
+conditional_plot <- function(df, column_name) {
+  col_data <- df[[column_name]]
+  
+  if (is.factor(col_data) || is.character(col_data)) {
+    # Create a bar plot for categorical/factor data
+    plot <- ggplot(df, aes_string(x = column_name)) +
+      geom_bar() +
+      labs(title = paste("Bar plot for", column_name),
+           x = column_name,
+           y = "Frequency") +
+      theme_minimal()
+  } else if (is.numeric(col_data)) {
+    # Create a histogram for continuous data
+    plot <- ggplot(df, aes_string(x = column_name)) +
+      geom_histogram(bins = 30) +
+      labs(title = paste("Histogram for", column_name),
+           x = column_name,
+           y = "Frequency") +
+      theme_minimal()
+  } else {
+    stop("The provided column is neither categorical nor continuous.")
+  }
+  
+  return(plot)
+}
+
+# Create a sample data frame
+sample_data <- data.frame(
+  category = factor(c("A", "B", "A", "C", "B", "B", "A", "C", "A", "B")),
+  value = c(10, 25, 13, 29, 37, 12, 20, 30, 14, 23)
+)
+
+# Create a bar plot for the 'category' column
+conditional_plot(sample_data, "category")
+
+# Create a histogram for the 'value' column
+conditional_plot(sample_data, "value")
+
 
 
 ```
